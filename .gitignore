@@ -62,3 +62,12 @@ Dockerfile
 docker-compose.yml
 docker-compose.override.yml
 docker/
+
+#Terraform 
+*.tfplan 
+*.tfstate
+*.tfstate.backup
+*.tfstate.*
+.terraform/
+*.tfvars
+
