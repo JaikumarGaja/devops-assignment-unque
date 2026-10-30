@@ -70,4 +70,10 @@ docker/
 *.tfstate.*
 .terraform/
 *.tfvars
+.terraform.lock.hcl
 
+#AWS KEY 
+unique-assignment.pem
+
+#Notes
+notes.txt
