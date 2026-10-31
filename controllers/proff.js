@@ -107,4 +107,50 @@ const setAvailability = async (req, res, next) => {
       return next(new HttpError(error));
     }
   };
-export {setAvailability, cancelAppointments};
+
+  const updateAvailability = async (req, res, next) => {
+  try {
+    //Get the ID of the slot 
+    const { availabilityId } = req.params;
+    
+    //Get the new timings
+    const { startTime, endTime } = req.body;
+
+    //Basic validation
+    if (!req.user || !req.user.id) {
+      return next(new HttpError("No professor ID found", 400));
+    }
+    if (new Date(startTime) >= new Date(endTime)) {
+      return next(new HttpError("Start time must be before end time", 400));
+    }
+
+    //Find the exact slot in the database that belongs to this professor
+    const existingAvailability = await Availability.findOne({
+      _id: availabilityId,
+      professorId: req.user.id
+    });
+
+    //If it doesn't exist, throw an error
+    if (!existingAvailability) {
+      return next(new HttpError("Availability slot not found or unauthorized", 404));
+    }
+
+    //Update the timings without deleting the record
+    existingAvailability.startTime = startTime;
+    existingAvailability.endTime = endTime;
+    
+    // Save the changes back to the database
+    await existingAvailability.save();
+
+    //Send the success response
+    res.status(200).json({
+      message: "Availability updated successfully",
+      availability: existingAvailability
+    });
+
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError("Updating availability failed", 500));
+  }
+};
+export { setAvailability, cancelAppointments, updateAvailability };
